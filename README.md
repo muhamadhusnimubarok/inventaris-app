@@ -1,0 +1,1 @@
+git config --global --remove-section user
