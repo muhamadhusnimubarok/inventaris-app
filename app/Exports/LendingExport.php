@@ -12,7 +12,7 @@ class LendingExport implements FromCollection, WithHeadings, WithMapping, Should
 {
     public function collection()
     {
-        return Lending::with(['lendingDetails.item', 'createdBy'])->get();
+        return Lending::with(['lendingDetails.item', 'createdBy', 'returnedBy'])->get();
     }
 
   
@@ -27,9 +27,10 @@ class LendingExport implements FromCollection, WithHeadings, WithMapping, Should
                 $detail->qty,                         
                 $lending->user_name,                   
                 $lending->notes,                        
-                $lending->loan_date ? \Carbon\Carbon::parse($lending->loan_date)->format('M d, Y') : '-', // Kolom Date
-                $lending->return_date ? \Carbon\Carbon::parse($lending->return_date)->format('M d, Y') : '-', // Kolom Return Date
+                $lending->loan_date ? \Carbon\Carbon::parse($lending->loan_date)->format('M d, Y') : '-', 
+                $lending->return_date ? \Carbon\Carbon::parse($lending->return_date)->format('M d, Y') : '-',
                 $lending->createdBy->name ?? 'Admin',   
+                $lending->returnedBy->name ?? '-',   
             ];
         }
 
@@ -46,6 +47,7 @@ class LendingExport implements FromCollection, WithHeadings, WithMapping, Should
             'Date',
             'Return Date',
             'Edited By',
+            'Returned By',
         ];
     }
 }

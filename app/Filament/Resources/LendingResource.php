@@ -96,7 +96,23 @@ class LendingResource extends Resource
                     ->date('d F, Y')
                     ->badge()
                     ->color(fn($state) => $state ? 'success' : 'warning'),
-                Tables\Columns\TextColumn::make('createdBy.name')->label('Edited By'),
+
+                Tables\Columns\TextColumn::make('createdBy.name')
+                    ->label('Operator')
+                    ->description(function ($record) {
+                        if (!$record->return_date || !$record->returnedBy) {
+                            return null;
+                        }
+
+                        return new \Illuminate\Support\HtmlString(
+                            "<span class='inline-flex items-center justify-center px-2 py-0.5 mt-1 text-xs font-medium tracking-tight rounded-xl bg-gray-500/10 text-gray-700 border border-gray-500/20'>
+                Diterima oleh: {$record->returnedBy->name}
+            </span>"
+                        );
+                    })
+                    ->html()
+                    ->badge()
+                    ->color('primary'),
             ])
             ->headerActions([
                 Tables\Actions\Action::make('exportExcel')
@@ -117,15 +133,18 @@ class LendingResource extends Resource
                     ->button()
                     ->visible(fn($record) => $record->return_date === null)
                     ->requiresConfirmation()
-                    ->modalHeading('Anda yakin?')
-                    ->modalDescription('Pastikan barang sudah sesuai dengan sebelum dipinjam')
+                    ->modalHeading('Konfirmasi Pengembalian')
+                    ->modalDescription('Pastikan barang sudah sesuai dengan sebelum dipinjam.')
                     ->action(function ($record) {
-                        $record->update(['return_date' => now()]);
-
+                        $currentUserId = auth()->id();
+                        $returnedBy = ($currentUserId !== $record->created_by) ? $currentUserId : null;
+                        $record->update([
+                            'return_date' => now(),
+                            'returned_by' => $returnedBy,
+                        ]);
                         foreach ($record->lendingDetails as $detail) {
                             $detail->item->refreshAvailable();
                         }
-
                         Notification::make()->success()->title('Barang telah dikembalikan!')->send();
                     }),
                 Tables\Actions\DeleteAction::make()->button(),

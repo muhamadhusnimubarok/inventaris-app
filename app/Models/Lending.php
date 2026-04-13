@@ -13,15 +13,21 @@ class Lending extends Model
         'user_name',
         'loan_date',
         'return_date',
+        'returned_by',
         'notes',
     ];
 
 
-   public function createdBy(): BelongsTo { 
-        return $this->belongsTo(User::class, 'created_by'); 
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
     public function lendingDetails(): HasMany
-{
-    return $this->hasMany(LendingDetail::class);
-}
+    {
+        return $this->hasMany(LendingDetail::class);
+    }
+    public function returnedBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'returned_by');
+    }
 }
