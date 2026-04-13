@@ -76,4 +76,13 @@ class CategoryResource extends Resource
             'index' => Pages\ManageCategories::route('/'),
         ];
     }
+     public static function canViewAny(): bool
+    {
+        return auth()->user()->hasRole('super_admin');
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('super_admin');
+    }
 }

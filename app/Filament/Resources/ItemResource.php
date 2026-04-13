@@ -42,7 +42,7 @@ class ItemResource extends Resource
                     ->searchable()
                     ->preload()
                     ->relationship('category', 'name')
-                    ->placeholder('Pilih Division PJ')
+                    ->placeholder('Pilih Kategori')
                     ->columnSpanFull()
                     ->required(),
                 Forms\Components\TextInput::make('total')
@@ -52,9 +52,10 @@ class ItemResource extends Resource
                     ->required(),
 
                 Forms\Components\TextInput::make('new_broke_item')
-                    ->label(fn($get) => "New Broke Item (currently: " . ($get('repair') ?? 0) . ")")
+                    ->label(fn($get) => "Input Barang Rusak (sebelumnya: " . ($get('repair') ?? 0) . ")")
                     ->numeric()
                     ->visibleOn('edit')
+                    ->live(onBlur: true)
                     ->helperText('Input angka untuk menambah jumlah data repair sebelumnya')
                     ->dehydrated(false)
                     ->afterStateUpdated(function ($state, $set, $get) {
@@ -62,7 +63,7 @@ class ItemResource extends Resource
                             $currentRepair = (int)$get('repair') ?? 0;
                             $set('repair', $currentRepair + (int)$state);
                         }
-                    })->reactive(),
+                    }),
 
                 Forms\Components\Hidden::make('repair')->default(0),
 
@@ -100,7 +101,7 @@ class ItemResource extends Resource
                         ? LendingResource::getUrl('index', ['tableFilters[item_id][value]' => $record->id])
                         : null)
                     ->color(fn($state) => $state > 0 ? 'primary' : 'gray')
-                    ->description(fn($state) => $state > 0 ? 'Click to see details' : '')
+                    ->description(fn($state) => $state > 0 ? 'Klik untuk melihat detail ' : '')
 
             ])
             ->filters([

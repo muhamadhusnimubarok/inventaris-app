@@ -32,7 +32,7 @@ class Item extends Model
             ->sum('qty');
 
         $this->available = $this->total - ($this->repair ?? 0) - $ongoingLending;
-        $this->save();
+        $this->saveQuietly();
     }
     protected static function booted()
     {
